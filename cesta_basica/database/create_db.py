@@ -55,7 +55,7 @@ def create_db():
             CREATE TABLE IF NOT EXISTS ipca (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 data DATE NOT NULL,
-                valor REAL NOT NULL CHECK (valor >= 0)
+                valor REAL NOT NULL
             );
         ''')
 
@@ -63,9 +63,9 @@ def create_db():
         # Indices para otimização de consultas
         # ==============================
 
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_produto_categoria ON produto(categoria);")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_preco_produto ON preco_produto(produto_id);")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_preco_mercado ON preco_produto(mercado_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_produto_categoria ON produtos(categoria);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_preco_produto ON precos_produto(produto_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_preco_mercado ON precos_produto(mercado_id);")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_ipca_data ON ipca(data);")
 
         # Salvar as alterações 

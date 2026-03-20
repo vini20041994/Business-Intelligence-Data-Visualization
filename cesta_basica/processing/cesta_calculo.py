@@ -48,7 +48,40 @@ def cesta_basica_mais_barata(df):
     menor_preco['custo_total'] = menor_preco['preco'] * menor_preco['quantidade']
 
     custo_total_cesta = menor_preco['custo_total'].sum()
-    return menor_preco, custo_total_cesta
+
+    # Complementos mais baratos
+    menor_preco_complemento = df.loc[df.groupby('categoria')['preco'].idxmin()]
+    menor_preco_complemento = menor_preco_complemento[menor_preco_complemento['categoria'].isin(COMPLEMENTOS.keys())].copy()
+    menor_preco_complemento['quantidade'] = menor_preco_complemento['categoria'].map(COMPLEMENTOS)
+    menor_preco_complemento['custo_total'] = menor_preco_complemento['preco'] * menor_preco_complemento['quantidade']
+    custo_total_complemento = menor_preco_complemento['custo_total'].sum()
+
+    total_cesta_complemento = custo_total_cesta + custo_total_complemento
+
+    return menor_preco, custo_total_cesta, custo_total_complemento, total_cesta_complemento
+
+# ==============================
+# CESTA BÁSICA - MAIS CARA
+# ==============================
+
+def cesta_basica_mais_cara(df):
+    maior_preco = df.loc[df.groupby('categoria')['preco'].idxmax()]
+
+    maior_preco['quantidade'] = maior_preco['categoria'].map(CESTA_BASICA)
+    maior_preco['custo_total'] = maior_preco['preco'] * maior_preco['quantidade']
+
+    custo_total_cesta = maior_preco['custo_total'].sum()
+
+    # Complementos mais caros
+    maior_preco_complemento = df.loc[df.groupby('categoria')['preco'].idxmax()]
+    maior_preco_complemento = maior_preco_complemento[maior_preco_complemento['categoria'].isin(COMPLEMENTOS.keys())].copy()
+    maior_preco_complemento['quantidade'] = maior_preco_complemento['categoria'].map(COMPLEMENTOS)
+    maior_preco_complemento['custo_total'] = maior_preco_complemento['preco'] * maior_preco_complemento['quantidade']
+    custo_total_complemento = maior_preco_complemento['custo_total'].sum()
+
+    total_cesta_complemento = custo_total_cesta + custo_total_complemento
+
+    return maior_preco, custo_total_cesta, custo_total_complemento, total_cesta_complemento
 
 # ==============================
 # MONTAR CESTA BÁSICA 
@@ -69,27 +102,6 @@ def montar_cesta_basica(df, item, tipo = 'barata'):
     total_cesta = cesta['custo_total'].sum()
 
     return cesta, total_cesta
-
-# ==============================
-# CALCULAR CESTA BÁSICA
-# ==============================
-
-cesta_basica_mais_barata, custo_cesta_barata = montar_cesta_basica(df, CESTA_BASICA, tipo = 'barata')
-cesta_basica_mais_cara, custo_cesta_cara = montar_cesta_basica(df, CESTA_BASICA, tipo = 'cara')
-
-# ==============================
-# CALCULAR CESTA BÁSICA COMPLEMENTO
-# ==============================
-
-cesta_complemento_mais_barata, custo_cesta_complemento_mais_barata = montar_cesta_basica(df, COMPLEMENTOS, tipo = 'barata')
-cesta_complemento_mais_cara, custo_cesta_complemento_mais_cara = montar_cesta_basica(df, COMPLEMENTOS, tipo = 'cara')
-
-# ==============================
-# CALCULAR CESTA BÁSICA COMPLEMENTO + CESTA BÁSICA
-# ==============================
-
-total_cesta_complemento_mais_barata = custo_cesta_barata + custo_cesta_complemento_mais_barata
-total_cesta_complemento_mais_cara = custo_cesta_cara + custo_cesta_complemento_mais_cara
 
 # ==============================
 # IPCA ACUMULADO POR ANO

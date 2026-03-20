@@ -15,7 +15,8 @@ def carregar_ipca_no_db(dados):
 
         # Verificar se o registro já existe para evitar duplicidade
         cursor.execute("SELECT id FROM ipca WHERE data = ?", (data,))
-        if cursor.fetchone()[0] == 0:
+        existing = cursor.fetchone()
+        if existing is None:
             cursor.execute("INSERT INTO ipca (data, valor) VALUES (?, ?)", (data, valor))
             inseridos += 1
 
