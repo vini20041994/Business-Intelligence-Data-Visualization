@@ -34,7 +34,7 @@ def transformar_ipca(dados_brutos):
 
     return dados_transformados
 
-def carregar_ipca()
+def carregar_ipca():
     dados_brutos = extrair_ipca()
     if not dados_brutos:
         print("Nenhum dado para carregar.")
@@ -43,7 +43,3 @@ def carregar_ipca()
     dados_transformados = transformar_ipca(dados_brutos)
     return dados_transformados
 
-if __name__ == "__main__":
-    dados = carregar_ipca()
-    for item in dados:
-        print(f"Data: {item['data']}, Valor: {item['valor']}")

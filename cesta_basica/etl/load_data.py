@@ -1,5 +1,5 @@
 import sqlite3
-from ipca_api import carregar_ipca
+from .ipca_api import carregar_ipca
 
 DB_NAME = 'cesta.db'
 
@@ -24,4 +24,3 @@ def carregar_ipca_no_db(dados):
 
     print(f"{inseridos} registros de IPCA inseridos no banco de dados.")
 
-if __name__ == "__main__":
