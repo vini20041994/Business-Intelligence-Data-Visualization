@@ -1,80 +1,113 @@
 import sqlite3
 
+
 def create_db():
+
     try:
-        # Conexão ao banco de dados (será criado se não existir)
-        conn = sqlite3.connect('cesta.db')
+
+        # Conexão ao banco (cria se não existir)
+        conn = sqlite3.connect("cesta.db")
+
         cursor = conn.cursor()
 
-        # Ativar o suporte a chaves estrangeiras
+        # Ativar suporte a FK
         cursor.execute("PRAGMA foreign_keys = ON;")
 
+        # Remover tabela de mercado e colunas dependentes, se existir
+        cursor.execute("DROP TABLE IF EXISTS mercados;")
+
         # ==============================
-        # Criação da tabela 'produtos'
+        # TABELA PRODUTOS
         # ==============================
-        cursor.execute('''
+
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS produtos (
+
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nome TEXT NOT NULL,
+
+                nome TEXT NOT NULL UNIQUE,
+
                 categoria TEXT NOT NULL
+
             );
-        ''')
+        """)
+
 
         # ==============================
-        # Criação da tabela 'mercados'
+        # TABELA PREÇOS
         # ==============================
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS mercados (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nome TEXT NOT NULL,
-                cidade TEXT NOT NULL
-            );
-        ''')
 
-        # ==============================
-        # Criação da tabela 'precos'
-        # ==============================
-        cursor.execute('''
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS precos_produto (
+
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+
                 produto_id INTEGER NOT NULL,
+
                 marca TEXT NOT NULL,
-                mercado_id INTEGER NOT NULL,
-                preco REAL NOT NULL CHECK (preco > 0),
+
+                preco REAL NOT NULL CHECK(preco > 0),
+
                 data_coleta DATE NOT NULL,
 
-                FOREIGN KEY (produto_id) REFERENCES produtos(id),
-                FOREIGN KEY (mercado_id) REFERENCES mercados(id)
-            );
-        ''')
+                FOREIGN KEY(produto_id)
+                REFERENCES produtos(id)
 
-        # ================================
-        # Criação da tabela 'IPCA'
-        # ================================
-        cursor.execute('''
+            );
+        """)
+
+
+        # ==============================
+        # TABELA IPCA
+        # ==============================
+
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS ipca (
+
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+
                 data DATE NOT NULL,
+
                 valor REAL NOT NULL
+
             );
-        ''')
+        """)
+
 
         # ==============================
-        # Indices para otimização de consultas
+        # ÍNDICES (OTIMIZAÇÃO)
         # ==============================
 
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_produto_categoria ON produtos(categoria);")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_preco_produto ON precos_produto(produto_id);")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_preco_mercado ON precos_produto(mercado_id);")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_ipca_data ON ipca(data);")
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS
+            idx_produto_categoria
+            ON produtos(categoria);
+        """)
 
-        # Salvar as alterações 
+
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS
+            idx_preco_produto
+            ON precos_produto(produto_id);
+        """)
+
+
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS
+            idx_ipca_data
+            ON ipca(data);
+        """)
+
 
         conn.commit()
-        print("Banco de dados criado com sucesso!")
+
+        print("Banco criado com sucesso!")
 
     except Exception as e:
-        print(f"Erro ao criar o banco de dados: {e}")
-    finally:
-        conn.close()
 
+        print("Erro ao criar banco:", e)
+
+
+    finally:
+
+        conn.close()

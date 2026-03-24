@@ -16,9 +16,9 @@ CESTA_BASICA = {
 }
 
 COMPLEMENTOS = {
-    'macarrão': 1.0,  # kg,
-    'farinha': 1.0,  # kg,
-    'sal': 1.0,  # kg
+    'Macarrão': 1.0,  # kg,
+    'Farinha': 0.5,  # kg,
+    'Sal': 1.0,  # kg
 }
 
 # ==============================
@@ -28,10 +28,9 @@ COMPLEMENTOS = {
 def carregar_dados():
     conn = sqlite3.connect(DB_NAME)
     query = '''
-        SELECT p.nome AS Produto, p.categoria , pr.marca, m.nome AS mercado, pr.preco, pr.data_coleta
+        SELECT p.nome AS Produto, p.categoria, pr.marca, pr.preco, pr.data_coleta
             FROM precos_produto pr
-                JOIN produtos p ON pr.produto_id = p.id
-                JOIN mercados m ON pr.mercado_id = m.id'''
+                JOIN produtos p ON pr.produto_id = p.id'''
     
     df = pd.read_sql_query(query, conn)
     conn.close()

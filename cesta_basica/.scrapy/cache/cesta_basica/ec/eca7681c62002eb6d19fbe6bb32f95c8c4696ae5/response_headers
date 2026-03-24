@@ -1,0 +1,26 @@
+Content-Type: text/html; charset=utf-8
+Date: Tue, 24 Mar 2026 19:11:25 GMT
+X-Vtex-Cache-Backend-Connect-Time: 0.000
+X-Vtex-Cache-Backend-Header-Time: 0.025
+Server: nginx
+Cache-Control: public, max-age=605, stale-while-revalidate=1200, stale-if-error=3600
+Content-Encoding: gzip
+Etag: "CB875E28282E8C96AC57E2ACE3705455"
+Warning: 110 kube-router "Response is Stale"
+X-Vtex-Janus-Router-Backend-App: io-production-vstore-group-1-1a-cl4
+X-Router-Cache: STALE_WHILE_REVALIDATE
+X-Frame-Options: SAMEORIGIN
+X-Vtex-Etag-Control: public, max-age=605
+X-Vtex-Router-Elapsed-Time: 00:00:00.0023587
+X-Vtex-Io-Cluster-Id: prod-dj-iostore-eks-use1a-cl4
+X-Vtex-Router-Version: 9.17.22
+X-Vtex-Cache-Status: EXPIRED
+X-Powered-By-Vtex-Cache: 2.6.1
+X-Vtex-Cache-Server: ip-10-203-78-87.ec2.internal
+X-Vtex-Cache-Time: 0.025
+Vary: accept-encoding
+X-Cache: Miss from cloudfront
+Via: 1.1 9cedf3d2b4720a40f34ec5bb749a2d48.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: GRU3-P13
+X-Amz-Cf-Id: Ww-O7W_z313g0nzoQW8qzltd7nlGiqsV9x-q22F7V2ljLDJ996x2GQ==
+Age: 1629

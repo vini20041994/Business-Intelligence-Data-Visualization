@@ -13,7 +13,7 @@ class CestaSpider(scrapy.Spider):
 
     custom_settings = {
         'DOWNLOAD_DELAY': 2,  # Atraso entre as requisições para evitar sobrecarregar o servidor
-        'RADOMIZE_DOWNLOAD_DELAY': True,  # Randomiza o atraso para parecer mais natural
+        'RANDOMIZE_DOWNLOAD_DELAY': True,  # Randomiza o atraso para parecer mais natural
         'CONCURRENT_REQUESTS' : 1,  # Limita a quantidade de requisições simultâneas
         'LOG_FILE': 'scrapay_output.log',  # Log das atividades do spider
 
@@ -34,9 +34,10 @@ class CestaSpider(scrapy.Spider):
         produtos = response.xpath(
             '//sitemap/loc[contains(text(),"/product")]/text()'
         )
+        print('Products: ')
 
         for url in produtos:
-            yield response.follow(url.get(), self.parse_lista_produtos)
+            yield response.follow(url, self.parse_lista_produtos)
     
     # ==============================
     # Função para filtrar os dados dos produtos da cesta básica
@@ -48,15 +49,7 @@ class CestaSpider(scrapy.Spider):
         urls = response.xpath('//url/loc/text()').getall()
 
         for url in urls:
-
-            url_lower = url.lower()
-
-            # FILTRO DA CESTA BÁSICA
-            if any(prod in url_lower for prod in [
-                "arroz", "feijao", "óleo", "oleo",
-                "acucar", "açucar", "cafe"
-            ]):
-                yield response.follow(url, self.parse_info_produtos)
+            yield response.follow(url, self.parse_info_produtos)
 
     # ==============================
     # Função para extrair as informações dos produtos da cesta básica
@@ -64,11 +57,19 @@ class CestaSpider(scrapy.Spider):
 
     def parse_info_produtos(self, response):
 
-        nome = response.xpath('//h1/text()').get()
-        preco = response.xpath('//span[contains(@class,"price")]/text()').get()
+        nome_parts = response.xpath('//h1//text()').getall()
+        if not nome_parts:
+            nome_parts = response.xpath('//h3[contains(@class,"vtex-product-summary-2-x-productNameContainer")]//text()').getall()
+        nome = ''.join([t.strip() for t in nome_parts if t.strip()]).strip()
+
+        preco = response.xpath('//p[contains(@class,"giassi-apps-custom-0-x-priceUnit") or contains(@class,"giassi-apps-custom-0-x-priceTotalUnita")]/text()').get()
+        if not preco:
+            preco = response.xpath('//p[contains(@class,"price")]/text()').get()
 
         if preco:
-            preco = preco.replace("R$", "").replace(",", ".").strip()
+            preco = preco.replace("R$", "").replace("&nbsp;", "").replace(" ", "").replace(",", ".").strip()
+            # remove any nondigit except dot
+            preco = ''.join([c for c in preco if c.isdigit() or c == '.'])
 
         if nome and preco:
             # Determinar categoria
@@ -95,18 +96,11 @@ class CestaSpider(scrapy.Spider):
                 if produto_id == 0:
                     produto_id = cursor.execute("SELECT id FROM produtos WHERE nome = ?", (nome,)).fetchone()[0]
 
-                # Assumir marca e mercado
+                # Assumir marca
                 marca = 'Giassi'
-                mercado_nome = 'Giassi'
-                cidade = 'São Paulo'
-
-                cursor.execute("INSERT OR IGNORE INTO mercados (nome, cidade) VALUES (?, ?)", (mercado_nome, cidade))
-                mercado_id = cursor.lastrowid
-                if mercado_id == 0:
-                    mercado_id = cursor.execute("SELECT id FROM mercados WHERE nome = ?", (mercado_nome,)).fetchone()[0]
 
                 data_coleta = date.today()
-                cursor.execute("INSERT INTO precos_produto (produto_id, marca, mercado_id, preco, data_coleta) VALUES (?, ?, ?, ?, ?)", (produto_id, marca, mercado_id, float(preco), data_coleta))
+                cursor.execute("INSERT INTO precos_produto (produto_id, marca, preco, data_coleta) VALUES (?, ?, ?, ?)", (produto_id, marca, float(preco), data_coleta))
 
                 conn.commit()
                 conn.close()
